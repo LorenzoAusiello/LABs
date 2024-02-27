@@ -1,4 +1,4 @@
-### Database design
+### DATABASE DESIGN
 
 SQL: Table Join and Set Operation	Assignment I Due & Assignment II Publish
 

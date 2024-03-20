@@ -28,3 +28,38 @@ Numpy and Pandas
 
 Time Data Handling and Data Visualization	
 
+### R COURSE
+
+Data structures & Loops	
+
+Self-defined functions, ”apply” functions
+
+Date and Time objects	
+
+Packages: quantmod
+
+Stats in R
+
+Generating Random Variables
+
+Discrete distribution & Sampling
+
+Returns & Moments
+
+Linear regression
+
+Stepwise selection
+
+Bisection method & Newton's Method Gradient Descent
+
+BS Model & Implied Volatility
+
+Monte-Carlo Simulation
+
+Optimization in R
+
+Interpolation
+
+Rmarkdown and Basic LaTeX
+
+

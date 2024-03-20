@@ -1,0 +1,113 @@
+---
+title: "Assignment 4"
+author: "Lorenzo Ausiello"
+date: "2023-12-11"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F)
+library(quantmod)
+library(quadprog)
+```
+
+
+**QUESTION 1**
+
+## 1.1
+
+Write this problem into the form on page 9 to find f, ui and ci. Then use function constrOptim() to find the optimal portfolio weights x and the optimal value, you can choose starting point as (2, -2, 0).
+
+```{r cars1}
+
+mu <- c(0.0427, 0.0015, 0.0285)
+sigma <- matrix(c(0.01, 0.002, 0.001, 0.002, 0.011, 0.003, 0.001, 0.003, 0.02),nrow=3, ncol=3)
+
+f <- function(x) 0.5*t(x)%*%sigma%*%x
+
+ui <- matrix(c(0.0427, 0.0015, 0.0285, -1, -1, -1), 2, 3, byrow = TRUE)
+ci <- c(0.05, -1)
+
+constrOptim(c(2,-2,0), f, grad = NULL, ui = ui, ci = ci)$par
+constrOptim(c(2,-2,0), f, grad = NULL, ui = ui, ci = ci)$value
+```
+
+## 1.2
+
+Write this problem into the form on page 18 to find D, d, A and b. Then use function solve.QP() to find the optimal portfolio weights x and the optimal value.
+
+```{r cars2}
+
+D <- matrix(c(0.01, 0.002, 0.001, 0.002, 0.011, 0.003, 0.001, 0.003, 0.02),nrow=3, ncol=3)
+d <- c(0,0,0)
+A <- matrix(c(0.0427, 0.0015, 0.0285, -1, -1, -1), 3, 2)
+b <- c(0.05, -1)
+
+solve.QP(D, d, A, b)$solution
+solve.QP(D, d, A, b)$value
+```
+
+**QUESTION 2**
+
+## 2.1
+
+Use linear interpolation to find r(out).
+
+```{r cars3}
+
+t <- c(0.25, 0.5, 1, 2, 3, 5, 7, 10)
+r <- c(0.0009, 0.0011, 0.0016, 0.002, 0.0024, 0.0036, 0.0053, 0.0064)
+tout <- c(0.75, 1.5, 4, 6, 8)
+rout <- approx(t, r, tout, method = "linear")
+print(rout)
+
+plot(t, r, type = "o", col = "blue", pch = 16, xlab = "Time", ylab = "Rate", main = "Linear Interpolation")
+points(tout, rout$y, col = "red", pch = 16)
+
+```
+
+## 2.2
+
+Use spline interpolation to find rout.
+
+```{r cars4}
+rout.s <- spline(t, r, xout = tout, method = "natural")
+rout.s$y
+
+plot(t, r, type = "o", col = "blue", pch = 16, xlab = "Time", ylab = "Rate", main = "Spline Interpolation")
+points(tout, rout.s$y, col = "green", pch = 16)
+```
+
+**QUESTION 3**
+
+Calculate the value from above equation using numerical integration with S0 = 100, K = 100, T = 1, r = 0.05, sigma = 0.2, compare to the call option price from Black-Scholes formula with the same parameters. 
+
+## Numerical integration
+
+```{r cars5}
+S <- 100
+K <- 100
+sigma <- 0.2
+r <- 0.05
+tau <- 1
+
+# Retrieving the Call Price 
+call.option <- function(x){ (S*exp((r-0.5*sigma^2)*tau+sigma*sqrt(tau)*x)-K)*dnorm(x)}
+d2 <- (log(S/K)+(r-0.5*sigma^2)*tau)/(sigma*sqrt(tau))
+integrate(call.option, -d2, Inf)$value * exp(-r*tau)
+```
+
+## Black-Scholes formula
+
+```{r cars6}
+
+bs.call <- function(S, K, tau, sigma, r){
+  d2 <- (log(S/K) + (r - 0.5 * sigma^2) * tau) / (sigma * sqrt(tau))
+  d1 <- d2 + sigma * sqrt(tau)
+  option_price <- S * pnorm(d1) - K * exp(-r * tau)  * pnorm(d2)
+  return(option_price)
+}
+
+call_price <- bs.call(S, K, tau, sigma, r)
+print(call_price)
+```

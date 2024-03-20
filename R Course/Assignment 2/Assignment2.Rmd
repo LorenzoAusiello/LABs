@@ -1,0 +1,157 @@
+---
+title: "FE515 2022A Assignment 2"
+author: "Lorenzo Ausiello"
+date: "10/17/2023"
+output:
+  pdf_document:
+    df_print: kable
+    fig_caption: yes
+    latex_engine: xelatex
+---
+```{r setup, include=T}
+library(knitr)
+knitr::opts_chunk$set(echo = T, out.width="80%",out.height="80%", warning = F)
+```
+
+
+# Question 1: 
+
+## 1.1 
+
+Find the attached JPM.csv file. Use as.Date() function to change the first column to Date object.
+
+```{r}
+setwd("C:/Users/loaus/OneDrive - stevens.edu/STEVENS/Intro to R/Assignment/Assignment_2")
+JPM <- read.csv("FE515_hw2_JPM.csv")
+
+# Changing first column to Date object
+JPM$X <- as.Date(JPM$X)
+head(JPM)
+tail(JPM)
+```
+
+## 1.2
+
+Plot the adjusted close price against the date object (i.e. date object as x-axis and close price as y-axis) in red line (require no points). Set the title as JPM, the label for x-axis as Date and the label for y-axis as Adjusted Close Price.
+
+```{r}
+plot(JPM$X, JPM$JPM.Adjusted, type = "l", main = "JPM",
+xlim = c(as.Date("1970-01-01"), as.Date("1980-08-16")),ylim = c(0,200),
+xlab = "Date", ylab = "Adjusted Close Price", col = "red")
+```
+
+## 1.3 
+
+Create a scatter plot of close price against open price (i.e. open prices as x-axis, and close prices as y-axis). Set the x label as ”Open Price” and y label as ”Close Price”.
+
+```{r}
+plot(JPM$JPM.Open, JPM$JPM.Close, type = "p", main = "Scatter plot: Open Prices vs Close Prices",
+xlim = c(0,200),ylim = c(0,200),
+xlab = "Open Price", ylab = "Close Price", col = "red")
+```
+
+## 1.4 
+
+Use cut() function to divide adjusted close price into 4 intervals. Generate a barplot for the frequencies of these intervals.
+.
+
+```{r}
+cut <- table(cut(JPM$JPM.Adjusted,4))
+cut
+barplot(cut, xlab = "Adjusted Close Price", ylab = "Frequency", main = "Barplot Adj.Close Price intervals")
+```
+
+## 1.5
+
+Generate a boxplot of volume against the 4 intervals of adjusted close prices.
+
+```{r}
+Intervals <- cut(JPM$JPM.Adjusted,breaks = 4)
+tail(Intervals)
+boxplot(JPM$JPM.Volume ~ Intervals, xlab = "Adjusted Close Price Intervals", ylab = "Volume", main = "Boxplot of Volume by Price Intervals")
+```
+
+## 1.6
+
+Use par() function to create a picture of 4 subplots. Gather the 4 figures from 1.2 - 1.5 into ONE single picture. Please arrange the 4 subplots into a 2 by 2 frame, i.e. a frame consists of 2 columns and 2 rows.
+
+```{r}
+{par(mfrow = c(2, 2))
+  plot(JPM$X, JPM$JPM.Adjusted, type = "l", main = "Adj. Close Price Path",
+  xlim = c(as.Date("1970-01-01"), as.Date("1980-08-16")),ylim = c(0,200),
+  xlab = "Date", ylab = "Adjusted Close Price", col = "red")
+  plot(JPM$JPM.Open, JPM$JPM.Close, type = "p", main = "Scatter plot: Open Prices vs Close Prices",
+  xlim = c(0,200),ylim = c(0,200),
+  xlab = "Open Price", ylab = "AClose Price", col = "yellow")
+  barplot(cut, xlab = "Adjusted Close Price", ylab = "Frequency", main = "Barplot Adj.Close Price intervals")
+  boxplot(JPM$JPM.Volume ~ Intervals, xlab = "Adjusted Close Price Intervals", ylab = "Volume",
+          main = "Boxplot of Volume by Price Intervals")}
+```
+
+
+# Question 2
+Estimate the volume of the unit sphere (which is just 4π/3) by simulation. Suppose we draw N points from three dimensional uniform distribution.
+
+```{r}
+N <- 10000
+x <- runif(N)
+y <- runif(N)
+z <- runif(N)
+
+num_inner_points <- 0
+for (i in 1:N) {
+  if(x[i]^2 + y[i]^2 + z[i]^2 <=1 & x[i]>= 0 & y[i]>= 0 & z[i]>= 0){
+    num_inner_points <- num_inner_points + 1
+  }
+}
+#or
+num_inner_points <- sum(x^2 + y^2 + z^2 <= 1)
+
+volume_sphere <- num_inner_points/N
+volum_unit_spere <- 8 * volume_sphere
+volum_unit_spere
+```
+
+# Question 3
+
+## 3.1
+Implement a Linear Congruential Generator (LCG)
+which generates pseudo-random number from uniform distribution using m = 244944, a = 1597, b = 51749.
+
+```{r}
+seed <- 1
+LCG <- function(n){
+m <- 244944
+a <- 1597
+b <- 51749
+x <- rep(NA, n)
+x[1] <- (a * seed + b) %% m
+for(i in 1:(n-1)){
+x[i + 1] <- (a * x[i] + b) %% m
+}
+seed <<- x[n]
+return(x/m)
+}
+
+seed<-1
+LCG(5)
+seed<-1
+LCG(5)
+seed<-100
+LCG(5)
+```
+
+## 3.2
+Use the LCG in the previous problem, generate 10000 random numbers from chi-square distribution with 10 degrees of freedom (i.e. df = 10), and assign to a variable.
+
+```{r}
+seed <- as.numeric(Sys.time())
+rnds <- qchisq(LCG(10000),df = 10)
+head(rnds)
+```
+
+## 3.3
+Visualize the resulting sample from 3.2 using a histogram with 40 bins.
+```{r}
+hist(rnds, nclass = 40)
+```

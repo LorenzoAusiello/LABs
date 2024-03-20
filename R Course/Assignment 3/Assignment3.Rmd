@@ -1,0 +1,270 @@
+---
+title: "FE515 Assignment 3"
+author: "Lorenzo Ausiello"
+date: "2023-11-19"
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F)
+library(quantmod)
+```
+
+**Question 1**:
+
+## 1.1 
+
+Download option prices of ticker VIX for all expiration dates and name it VIX.options
+
+```{r}
+VIX.options <- getOptionChain("^VIX",NULL)
+names(VIX.options)
+```
+
+## 1.2
+
+Download the current price (last quote price) for VIX
+
+```{r}
+last_p <- getQuote("^VIX")[['Last']]
+getQuote("^VIX")
+```
+
+## 1.3 
+
+For calls and puts of VIX.options at each expiration calculate the average of Bid and Ask. Create a new column named ‘Price‘ to contain the result.
+
+```{r}
+VIX.options$nov.22.2023$calls$Price <- 0.5*(VIX.options$nov.22.2023$calls$Bid
+                                                 + VIX.options$nov.22.2023$calls$Ask)
+VIX.options$nov.29.2023$calls$Price <- 0.5*(VIX.options$nov.29.2023$calls$Bid
+                                            + VIX.options$nov.29.2023$calls$Ask)
+VIX.options$dic.06.2023$calls$Price <- 0.5*(VIX.options$dic.06.2023$calls$Bid
+                                            + VIX.options$dic.06.2023$calls$Ask)
+VIX.options$dic.13.2023$calls$Price <- 0.5*(VIX.options$dic.13.2023$calls$Bid
+                                            + VIX.options$dic.13.2023$calls$Ask)
+VIX.options$dic.20.2023$calls$Price <- 0.5*(VIX.options$dic.20.2023$calls$Bid
+                                            + VIX.options$dic.20.2023$calls$Ask)
+VIX.options$gen.17.2024$calls$Price <- 0.5*(VIX.options$gen.17.2024$calls$Bid
+                                            + VIX.options$gen.17.2024$calls$Ask)
+VIX.options$feb.14.2024$calls$Price <- 0.5*(VIX.options$feb.14.2024$calls$Bid
+                                            + VIX.options$feb.14.2024$calls$Ask)
+VIX.options$mar.20.2024$calls$Price <- 0.5*(VIX.options$mar.20.2024$calls$Bid
+                                            + VIX.options$mar.20.2024$calls$Ask)
+VIX.options$apr.17.2024$calls$Price <- 0.5*(VIX.options$apr.17.2024$calls$Bid
+                                            + VIX.options$apr.17.2024$calls$Ask)
+VIX.options$mag.22.2024$calls$Price <- 0.5*(VIX.options$mag.22.2024$calls$Bid
+                                            + VIX.options$mag.22.2024$calls$Ask)
+VIX.options$giu.18.2024$calls$Price <- 0.5*(VIX.options$giu.18.2024$calls$Bid
+                                            + VIX.options$giu.18.2024$calls$Ask)
+VIX.options$lug.17.2024$calls$Price <- 0.5*(VIX.options$lug.17.2024$calls$Bid
+                                            + VIX.options$lug.17.2024$calls$Ask)
+
+VIX.options$nov.22.2023$puts$Price <- 0.5*(VIX.options$nov.22.2023$puts$Bid
+                                                 + VIX.options$nov.22.2023$puts$Ask)
+VIX.options$nov.29.2023$puts$Price <- 0.5*(VIX.options$nov.29.2023$puts$Bid
+                                            + VIX.options$nov.29.2023$puts$Ask)
+VIX.options$dic.06.2023$puts$Price <- 0.5*(VIX.options$dic.06.2023$puts$Bid
+                                            + VIX.options$dic.06.2023$puts$Ask)
+VIX.options$dic.13.2023$puts$Price <- 0.5*(VIX.options$dic.13.2023$puts$Bid
+                                            + VIX.options$dic.13.2023$puts$Ask)
+VIX.options$dic.20.2023$puts$Price <- 0.5*(VIX.options$dic.20.2023$puts$Bid
+                                            + VIX.options$dic.20.2023$puts$Ask)
+VIX.options$gen.17.2024$puts$Price <- 0.5*(VIX.options$gen.17.2024$puts$Bid
+                                            + VIX.options$gen.17.2024$puts$Ask)
+VIX.options$feb.14.2024$puts$Price <- 0.5*(VIX.options$feb.14.2024$puts$Bid
+                                            + VIX.options$feb.14.2024$puts$Ask)
+VIX.options$mar.20.2024$puts$Price <- 0.5*(VIX.options$mar.20.2024$puts$Bid
+                                            + VIX.options$mar.20.2024$puts$Ask)
+VIX.options$apr.17.2024$puts$Price <- 0.5*(VIX.options$apr.17.2024$puts$Bid
+                                            + VIX.options$apr.17.2024$puts$Ask)
+VIX.options$mag.22.2024$puts$Price <- 0.5*(VIX.options$mag.22.2024$puts$Bid
+                                            + VIX.options$mag.22.2024$puts$Ask)
+VIX.options$giu.18.2024$puts$Price <- 0.5*(VIX.options$giu.18.2024$puts$Bid
+                                            + VIX.options$giu.18.2024$puts$Ask)
+VIX.options$lug.17.2024$puts$Price <- 0.5*(VIX.options$lug.17.2024$puts$Bid
+                                            + VIX.options$lug.17.2024$puts$Ask)
+```
+
+Showing one of the results above as proof.
+```{r}
+head(VIX.options$dic.20.2023$puts[,c('ContractID','Expiration','Strike','Bid','Ask','Price')])
+```
+
+## 1.4 
+
+For calls and puts of VIX.options at each expiration, add a column of InTheMoney, which takes value TRUE when it is in-the-money, and FALSE otherwise. Compare it to ITM column to check your results.
+(Hint. A call option is in-the-money when its strike is less than the current price of underlying. A put option is in-the-money if its strike is greater than the current price of underlying. And the current price of underlying is the last quote price from 1.2)
+
+
+```{r}
+VIX.options$nov.22.2023$puts$InTheMoney <- VIX.options$nov.22.2023$puts$Strike > last_p
+VIX.options$nov.29.2023$puts$InTheMoney <- VIX.options$nov.29.2023$puts$Strike > last_p
+VIX.options$dic.06.2023$puts$InTheMoney <- VIX.options$dic.06.2023$puts$Strike > last_p
+VIX.options$dic.13.2023$puts$InTheMoney <- VIX.options$dic.13.2023$puts$Strike > last_p
+VIX.options$dic.20.2023$puts$InTheMoney <- VIX.options$dic.20.2023$puts$Strike > last_p
+VIX.options$gen.17.2024$puts$InTheMoney <- VIX.options$gen.17.2024$puts$Strike > last_p
+VIX.options$feb.14.2024$puts$InTheMoney <- VIX.options$feb.14.2024$puts$Strike > last_p
+VIX.options$mar.20.2024$puts$InTheMoney <- VIX.options$mar.20.2024$puts$Strike > last_p
+VIX.options$apr.17.2024$puts$InTheMoney <- VIX.options$apr.17.2024$puts$Strike > last_p
+VIX.options$mag.22.2024$puts$InTheMoney <- VIX.options$mag.22.2024$puts$Strike > last_p
+VIX.options$giu.18.2024$puts$InTheMoney <- VIX.options$giu.18.2024$puts$Strike > last_p
+VIX.options$lug.17.2024$puts$InTheMoney <- VIX.options$lug.17.2024$puts$Strike > last_p
+
+VIX.options$nov.22.2023$calls$InTheMoney <- VIX.options$nov.22.2023$calls$Strike < last_p
+VIX.options$nov.29.2023$calls$InTheMoney <- VIX.options$nov.29.2023$calls$Strike < last_p
+VIX.options$dic.06.2023$calls$InTheMoney <- VIX.options$dic.06.2023$calls$Strike < last_p
+VIX.options$dic.13.2023$calls$InTheMoney <- VIX.options$dic.13.2023$calls$Strike < last_p
+VIX.options$dic.20.2023$calls$InTheMoney <- VIX.options$dic.20.2023$calls$Strike < last_p
+VIX.options$gen.17.2024$calls$InTheMoney <- VIX.options$gen.17.2024$calls$Strike < last_p
+VIX.options$feb.14.2024$calls$InTheMoney <- VIX.options$feb.14.2024$calls$Strike < last_p
+VIX.options$mar.20.2024$calls$InTheMoney <- VIX.options$mar.20.2024$calls$Strike < last_p
+VIX.options$apr.17.2024$calls$InTheMoney <- VIX.options$apr.17.2024$calls$Strike < last_p
+VIX.options$mag.22.2024$calls$InTheMoney <- VIX.options$mag.22.2024$calls$Strike < last_p
+VIX.options$giu.18.2024$calls$InTheMoney <- VIX.options$giu.18.2024$calls$Strike < last_p
+VIX.options$lug.17.2024$calls$InTheMoney <- VIX.options$lug.17.2024$calls$Strike < last_p
+
+```
+
+Showing one of the results above as proof.
+```{r}
+
+head(VIX.options$lug.17.2024$calls[,c('ITM','InTheMoney')])
+
+```
+
+
+## 1.5
+
+For calls and puts of VIX at each expiration, delete all the fields except Strike, Bid, Ask, Price, and In-The-Money, and save them in .csv files with the format ”VIXdata2021-09-26Exp2021-10-08puts.csv”, here 2021-09-26 should be replaced by the date you download the data, and 2021-10-08 should be replaced by the date of expiration.
+(Hint. You may generate many .csv files, besides your .pdf report, please submit one of the .csv file.)
+
+
+```{r}
+selected_columns <- c("Strike", "Bid", "Ask", "Price", "InTheMoney")
+
+file.path <- "VIXdata2023_11_19Exp2023_11_22calls.csv"
+write.csv(VIX.options$nov.22.2023$calls[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2023_11_29calls.csv"
+write.csv(VIX.options$nov.29.2023$calls[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2023_12_06calls.csv"
+write.csv(VIX.options$dic.06.2023$calls[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2023_12_13calls.csv"
+write.csv(VIX.options$dic.13.2023$calls[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2023_12_20calls.csv"
+write.csv(VIX.options$dic.20.2023$calls[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_01_17calls.csv"
+write.csv(VIX.options$gen.17.2024$calls[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_02_14calls.csv"
+write.csv(VIX.options$feb.14.2024$calls[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_03_20calls.csv"
+write.csv(VIX.options$mar.20.2024$calls[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_04_17calls.csv"
+write.csv(VIX.options$apr.17.2024$calls[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_05_22calls.csv"
+write.csv(VIX.options$mag.22.2024$calls[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_06_18calls.csv"
+write.csv(VIX.options$giu.18.2024$calls[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_07_17calls.csv"
+write.csv(VIX.options$lug.17.2024$calls[, selected_columns], file.path, row.names = FALSE)
+
+
+file.path <- "VIXdata2023_11_19Exp2023_11_22puts.csv"
+write.csv(VIX.options$nov.22.2023$calls[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2023_11_29puts.csv"
+write.csv(VIX.options$nov.29.2023$puts[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2023_12_06puts.csv"
+write.csv(VIX.options$dic.06.2023$puts[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2023_12_13puts.csv"
+write.csv(VIX.options$dic.13.2023$puts[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2023_12_20puts.csv"
+write.csv(VIX.options$dic.20.2023$puts[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_01_17puts.csv"
+write.csv(VIX.options$gen.17.2024$puts[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_02_14puts.csv"
+write.csv(VIX.options$feb.14.2024$puts[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_03_20puts.csv"
+write.csv(VIX.options$mar.20.2024$puts[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_04_17puts.csv"
+write.csv(VIX.options$apr.17.2024$puts[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_05_22puts.csv"
+write.csv(VIX.options$mag.22.2024$puts[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_06_18puts.csv"
+write.csv(VIX.options$giu.18.2024$puts[, selected_columns], file.path, row.names = FALSE)
+
+file.path <- "VIXdata2023_11_19Exp2024_07_17puts.csv"
+write.csv(VIX.options$lug.17.2024$puts[, selected_columns], file.path, row.names = FALSE)
+```
+
+**Question 2**
+
+## 2.1
+
+Using Monte-Carlo Simulation to estimate the put option price using S0 = 100, K = 100, T = 1, sigma = 0.2, r = 0.05, you can use number of steps n = 252 and number of paths m = 10000
+
+
+```{r}
+S0 <- 100
+K <- 100
+T1 <- 1
+sigma <- 0.2
+r <- 0.05
+n <- 252 
+h <- T1/n
+S <- c()
+Z <- c()
+S[1] <- S0
+m <- 10000
+S.mat <- NULL
+
+for(j in 1:m){
+  for (i in 1:n) {
+    Z[i] <- rnorm(1)
+    S[i+1] <- S[i] + r*S[i]*h + sigma*S[i]*Z[i]*sqrt(h)
+  }
+  S.mat <- cbind(S.mat,S)
+}
+
+# calculate put option price
+ST <- S.mat[n+1,]
+put_option_price <- exp(-r*T1)*mean(pmax(100 - ST, 0))
+put_option_price
+```
+
+## 2.2
+
+Implement Black-Scholes formula for pricing the put option
+Check the difference between the Black-Scholes price and the Monte-Carlo price.
+
+```{r}
+bs.put <- function(S0, K, T1, sigma, r){
+d1 <- (log(S0/K) + (r+0.5*sigma^2)*T1)/(sigma*sqrt(T1))
+d2 <- d1 - sigma*sqrt(T1)
+return(-S0*pnorm(-d1) + exp(-r*T1)*K*pnorm(-d2))
+}
+
+bs.put(100,100,1,0.2,0.05)
+```
